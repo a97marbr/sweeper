@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+		<head>
+				<title>Minesweeper</title>
+				<script>
+						let canvas;
+						let ctx;
+						let isRunning;
+						const grid=[];
+						const cols=10;
+						const rows=10;
+						const cellSize=20;
+
+						function setup()
+						{
+								canvas = document.getElementById('sea');
+								canvas.addEventListener('click', showCell, false);
+								ctx = canvas.getContext('2d');
+								ctx.canvas.width  = cols*cellSize;
+  							ctx.canvas.height = rows*cellSize;
+
+								for(let i=0;i<cols;i++){
+										for(let j=0;j<rows;j++){
+												if(typeof grid[i] === "undefined"){
+														grid[i]=[];
+												}
+												grid[i][j]={isRevealed:false,bomb:0,x:i,y:j};
+										}
+								}
+
+								//isRunning=true;
+								render();
+						}
+
+						function render()
+						{
+								ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+								for(let i=0;i<cols;i++){
+										for(let j=0;j<rows;j++){
+												let cell=grid[i][j];
+												if(cell.isRevealed){
+
+												}else{
+														drawCell(cell);
+												}
+										}
+								}
+
+								if(isRunning){
+										requestAnimationFrame(render);
+								}
+						}
+
+						function drawCell(cell)
+						{
+								ctx.save();
+								ctx.beginPath();
+								ctx.fillStyle = '#CCCCCC';
+								ctx.strokeStyle = '#000000'
+								ctx.fillRect(cell.x*cellSize, cell.y*cellSize, cellSize, cellSize);
+								ctx.strokeRect(cell.x*cellSize, cell.y*cellSize, cellSize, cellSize);
+								/*
+								ctx.moveTo(cell.x*cellSize, cell.y*cellSize);
+								ctx.lineTo(cell.x*cellSize+cellSize, cell.y*cellSize);
+								ctx.lineTo(cell.x*cellSize+cellSize, cell.y*cellSize+cellSize);
+								ctx.lineTo(cell.x*cellSize, cell.y*cellSize+cellSize);
+								ctx.fill();
+								*/
+								ctx.restore();
+						}
+
+						function showCell(evt)
+						{
+								console.log(evt);
+						}
+				</script>
+		</head>
+		<body onload="setup();">
+				<canvas id="sea"></canvas>
+		</body>
+</html>
