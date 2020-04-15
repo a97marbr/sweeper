@@ -6,6 +6,8 @@
 						let canvas;
 						let ctx;
 						let isRunning;
+						let revealedCount=0;
+						let bombCount=0;
 						const grid=[];
 						const cols=10;
 						const rows=10;
@@ -24,11 +26,11 @@
 												if(typeof grid[i] === "undefined"){
 														grid[i]=[];
 												}
-												grid[i][j]={isRevealed:false,bomb:0,x:i,y:j};
+												grid[i][j]={isRevealed:false,hasBomb:false,x:i,y:j};
 										}
 								}
 
-								//isRunning=true;
+								isRunning=true;
 								render();
 						}
 
@@ -38,11 +40,7 @@
 								for(let i=0;i<cols;i++){
 										for(let j=0;j<rows;j++){
 												let cell=grid[i][j];
-												if(cell.isRevealed){
-
-												}else{
-														drawCell(cell);
-												}
+												drawCell(cell);												
 										}
 								}
 
@@ -54,24 +52,49 @@
 						function drawCell(cell)
 						{
 								ctx.save();
-								ctx.beginPath();
-								ctx.fillStyle = '#CCCCCC';
-								ctx.strokeStyle = '#000000'
-								ctx.fillRect(cell.x*cellSize, cell.y*cellSize, cellSize, cellSize);
-								ctx.strokeRect(cell.x*cellSize, cell.y*cellSize, cellSize, cellSize);
-								/*
-								ctx.moveTo(cell.x*cellSize, cell.y*cellSize);
-								ctx.lineTo(cell.x*cellSize+cellSize, cell.y*cellSize);
-								ctx.lineTo(cell.x*cellSize+cellSize, cell.y*cellSize+cellSize);
-								ctx.lineTo(cell.x*cellSize, cell.y*cellSize+cellSize);
-								ctx.fill();
-								*/
+								if(cell.isRevealed){
+										if(cell.hasBomb){
+												ctx.fillStyle = '#FFFFFF';
+												ctx.strokeStyle = '#000000'
+												ctx.fillRect(cell.x*cellSize, cell.y*cellSize, cellSize, cellSize);
+												ctx.strokeRect(cell.x*cellSize, cell.y*cellSize, cellSize, cellSize);
+												alert("Bomb! You lost!");
+												isRunning=false;
+										}else{
+												ctx.fillStyle = '#FFFFFF';
+												ctx.strokeStyle = '#000000'
+												ctx.fillRect(cell.x*cellSize, cell.y*cellSize, cellSize, cellSize);
+												ctx.strokeRect(cell.x*cellSize, cell.y*cellSize, cellSize, cellSize);
+												if(revealedCount >= cols*rows-bombCount){
+														alert("You cleared all the cells without triggering any bombs. You won!");
+														isRunning=false;
+												}
+										}
+								}else{
+										ctx.fillStyle = '#CCCCCC';
+										ctx.strokeStyle = '#000000'
+										ctx.fillRect(cell.x*cellSize, cell.y*cellSize, cellSize, cellSize);
+										ctx.strokeRect(cell.x*cellSize, cell.y*cellSize, cellSize, cellSize);
+										/*
+										ctx.moveTo(cell.x*cellSize, cell.y*cellSize);
+										ctx.lineTo(cell.x*cellSize+cellSize, cell.y*cellSize);
+										ctx.lineTo(cell.x*cellSize+cellSize, cell.y*cellSize+cellSize);
+										ctx.lineTo(cell.x*cellSize, cell.y*cellSize+cellSize);
+										ctx.fill();
+										*/
+								}
 								ctx.restore();
 						}
 
 						function showCell(evt)
 						{
-								console.log(evt);
+								let mx=evt.clientX;
+								let my=evt.clientY;
+								let cx=Math.floor(mx/cellSize);
+								let cy=Math.floor(my/cellSize);
+								let cell=grid[cx][cy];
+								cell.isRevealed=true;
+								console.log(evt,mx,my,cx,cy,grid[cx][cy]);
 						}
 				</script>
 		</head>
