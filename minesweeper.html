@@ -99,7 +99,6 @@
 												ctx.strokeStyle = '#000000'
 												ctx.fillRect(cell.x*cellSize, cell.y*cellSize, cellSize, cellSize);
 												ctx.strokeRect(cell.x*cellSize, cell.y*cellSize, cellSize, cellSize);
-												//let count=countNeighbours(cell);
 												if(cell.countNeighbours > 0){
 														ctx.fillStyle = '#FF0000';
 														ctx.font = cellSize+'px san-serif';
@@ -117,13 +116,6 @@
 										ctx.strokeStyle = '#000000'
 										ctx.fillRect(cell.x*cellSize, cell.y*cellSize, cellSize, cellSize);
 										ctx.strokeRect(cell.x*cellSize, cell.y*cellSize, cellSize, cellSize);
-										/*
-										ctx.moveTo(cell.x*cellSize, cell.y*cellSize);
-										ctx.lineTo(cell.x*cellSize+cellSize, cell.y*cellSize);
-										ctx.lineTo(cell.x*cellSize+cellSize, cell.y*cellSize+cellSize);
-										ctx.lineTo(cell.x*cellSize, cell.y*cellSize+cellSize);
-										ctx.fill();
-										*/
 								}
 								ctx.restore();
 						}
