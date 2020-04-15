@@ -58,10 +58,11 @@
 
 								if(isRunning){
 										requestAnimationFrame(render);
-								}else{
+								}else{										
 										if(hasWon){
 												alert("You cleared all the cells without triggering any bombs. You won!");
 										}else{
+												revealeAll();
 												alert("Bomb! You lost!");
 										}
 								}
@@ -83,16 +84,18 @@
 												isRunning=false;
 												hasWon=false;
 										}else{
-												let count=countNeigbours(cell);
 												ctx.fillStyle = '#FFFFFF';
 												ctx.strokeStyle = '#000000'
 												ctx.fillRect(cell.x*cellSize, cell.y*cellSize, cellSize, cellSize);
 												ctx.strokeRect(cell.x*cellSize, cell.y*cellSize, cellSize, cellSize);
-												ctx.fillStyle = '#FF0000';
-												ctx.font = cellSize+'px san-serif';
-												ctx.textBaseline="middle";
-												ctx.textAlign="center";
-												ctx.fillText(count,cell.x*cellSize+cellSize/2,cell.y*cellSize+cellSize/2);
+												let count=countNeigbours(cell);
+												if(count > 0){
+														ctx.fillStyle = '#FF0000';
+														ctx.font = cellSize+'px san-serif';
+														ctx.textBaseline="middle";
+														ctx.textAlign="center";
+														ctx.fillText(count,cell.x*cellSize+cellSize/2,cell.y*cellSize+cellSize/2);
+												}
 												if(revealedCount >= cols*rows-bombCount){
 														isRunning=false;
 														hasWon=true;
@@ -130,7 +133,8 @@
 								let count=0;
 								for(let i=cell.x-1;i<=cell.x+1;i++){
 										for(let j=cell.y-1;j<=cell.y+1;j++){
-												if(i<=0 && i < cols && j >= 0 && j < rows){
+												console.log(i,j)
+												if(i>=0 && i < cols && j >= 0 && j < rows){
 														let neigbour=grid[i][j];												
 														if(neigbour.hasBomb){
 																count++;
@@ -139,6 +143,17 @@
 										}
 								}
 								return count;
+						}
+
+						function revealeAll()
+						{
+								for(let i=0;i<cols;i++){
+										for(let j=0;j<rows;j++){
+												let cell=grid[i][j];
+												cell.isRevealed=true;
+												drawCell(cell);
+										}
+								}
 						}
 				</script>
 		</head>
