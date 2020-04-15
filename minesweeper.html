@@ -12,7 +12,7 @@
 						const grid=[];
 						const cols=10;
 						const rows=10;
-						const cellSize=20;
+						const cellSize=30;
 						const level=0.1;
 
 						function setup()
@@ -29,6 +29,7 @@
 
 						function initGame()
 						{
+								// Random game board
 								for(let i=0;i<cols;i++){
 										for(let j=0;j<rows;j++){
 												if(typeof grid[i] === "undefined"){
@@ -37,10 +38,20 @@
 												let bomb=false
 												if(Math.random()<level){
 														bomb=true;
+														bombCount++;
 												}
-												grid[i][j]={isRevealed:false,hasBomb:bomb,x:i,y:j};
+												grid[i][j]={isRevealed:false,hasBomb:bomb,x:i,y:j,countNeighbours:0};
 										}
 								}
+								
+								// Count the neigbours
+								for(let i=0;i<cols;i++){
+										for(let j=0;j<rows;j++){
+												let cell = grid[i][j];
+												cell.countNeighbours=countNeighbours(cell);
+										}
+								}
+								console.log("Total cells", cols*rows,"Unrevealed cells",revealedCount, "bombs", bombCount);
 
 								isRunning=true;
 								render();
@@ -62,7 +73,7 @@
 										if(hasWon){
 												alert("You cleared all the cells without triggering any bombs. You won!");
 										}else{
-												revealeAll();
+												revealAll();
 												alert("Bomb! You lost!");
 										}
 								}
@@ -88,13 +99,13 @@
 												ctx.strokeStyle = '#000000'
 												ctx.fillRect(cell.x*cellSize, cell.y*cellSize, cellSize, cellSize);
 												ctx.strokeRect(cell.x*cellSize, cell.y*cellSize, cellSize, cellSize);
-												let count=countNeigbours(cell);
-												if(count > 0){
+												//let count=countNeighbours(cell);
+												if(cell.countNeighbours > 0){
 														ctx.fillStyle = '#FF0000';
 														ctx.font = cellSize+'px san-serif';
 														ctx.textBaseline="middle";
 														ctx.textAlign="center";
-														ctx.fillText(count,cell.x*cellSize+cellSize/2,cell.y*cellSize+cellSize/2);
+														ctx.fillText(cell.countNeighbours,cell.x*cellSize+cellSize/2,cell.y*cellSize+cellSize/2);
 												}
 												if(revealedCount >= cols*rows-bombCount){
 														isRunning=false;
@@ -124,16 +135,39 @@
 								let cx=Math.floor(mx/cellSize);
 								let cy=Math.floor(my/cellSize);
 								let cell=grid[cx][cy];
-								cell.isRevealed=true;
-								console.log(evt,mx,my,cx,cy,grid[cx][cy]);
+								revealCell(cell)
 						}
 
-						function countNeigbours(cell)
+						function revealCell(cell)
+						{
+								if(!cell.isRevealed){
+										cell.isRevealed=true;
+										revealedCount++;
+										if(cell.countNeighbours===0){
+												revealNeighbours(cell);
+										}
+								}
+						}
+
+						function revealNeighbours(cell)
 						{
 								let count=0;
 								for(let i=cell.x-1;i<=cell.x+1;i++){
 										for(let j=cell.y-1;j<=cell.y+1;j++){
-												console.log(i,j)
+												if(i>=0 && i < cols && j >= 0 && j < rows){
+														let neigbour=grid[i][j];		
+														revealCell(neigbour);
+												}
+										}
+								}
+								return count;
+						}
+
+						function countNeighbours(cell)
+						{
+								let count=0;
+								for(let i=cell.x-1;i<=cell.x+1;i++){
+										for(let j=cell.y-1;j<=cell.y+1;j++){
 												if(i>=0 && i < cols && j >= 0 && j < rows){
 														let neigbour=grid[i][j];												
 														if(neigbour.hasBomb){
@@ -145,7 +179,7 @@
 								return count;
 						}
 
-						function revealeAll()
+						function revealAll()
 						{
 								for(let i=0;i<cols;i++){
 										for(let j=0;j<rows;j++){
