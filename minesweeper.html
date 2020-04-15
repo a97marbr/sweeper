@@ -8,10 +8,12 @@
 						let isRunning;
 						let revealedCount=0;
 						let bombCount=0;
+						let hasWon=false;
 						const grid=[];
 						const cols=10;
 						const rows=10;
 						const cellSize=20;
+						const level=0.1;
 
 						function setup()
 						{
@@ -19,14 +21,24 @@
 								canvas.addEventListener('click', showCell, false);
 								ctx = canvas.getContext('2d');
 								ctx.canvas.width  = cols*cellSize;
-  							ctx.canvas.height = rows*cellSize;
+								ctx.canvas.height = rows*cellSize;
+								
+								initGame();
 
+						}
+
+						function initGame()
+						{
 								for(let i=0;i<cols;i++){
 										for(let j=0;j<rows;j++){
 												if(typeof grid[i] === "undefined"){
 														grid[i]=[];
 												}
-												grid[i][j]={isRevealed:false,hasBomb:false,x:i,y:j};
+												let bomb=false
+												if(Math.random()<level){
+														bomb=true;
+												}
+												grid[i][j]={isRevealed:false,hasBomb:bomb,x:i,y:j};
 										}
 								}
 
@@ -46,6 +58,12 @@
 
 								if(isRunning){
 										requestAnimationFrame(render);
+								}else{
+										if(hasWon){
+												alert("You cleared all the cells without triggering any bombs. You won!");
+										}else{
+												alert("Bomb! You lost!");
+										}
 								}
 						}
 
@@ -58,16 +76,26 @@
 												ctx.strokeStyle = '#000000'
 												ctx.fillRect(cell.x*cellSize, cell.y*cellSize, cellSize, cellSize);
 												ctx.strokeRect(cell.x*cellSize, cell.y*cellSize, cellSize, cellSize);
-												alert("Bomb! You lost!");
+												ctx.fillStyle = '#000000';
+												ctx.beginPath();
+												ctx.arc(cell.x*cellSize+cellSize/2, cell.y*cellSize+cellSize/2, 5, 0, Math.PI * 2, true);
+												ctx.fill();
 												isRunning=false;
+												hasWon=false;
 										}else{
+												let count=countNeigbours(cell);
 												ctx.fillStyle = '#FFFFFF';
 												ctx.strokeStyle = '#000000'
 												ctx.fillRect(cell.x*cellSize, cell.y*cellSize, cellSize, cellSize);
 												ctx.strokeRect(cell.x*cellSize, cell.y*cellSize, cellSize, cellSize);
+												ctx.fillStyle = '#FF0000';
+												ctx.font = cellSize+'px san-serif';
+												ctx.textBaseline="middle";
+												ctx.textAlign="center";
+												ctx.fillText(count,cell.x*cellSize+cellSize/2,cell.y*cellSize+cellSize/2);
 												if(revealedCount >= cols*rows-bombCount){
-														alert("You cleared all the cells without triggering any bombs. You won!");
 														isRunning=false;
+														hasWon=true;
 												}
 										}
 								}else{
@@ -88,17 +116,34 @@
 
 						function showCell(evt)
 						{
-								let mx=evt.clientX;
-								let my=evt.clientY;
+								let mx=evt.offsetX;
+								let my=evt.offsetY;
 								let cx=Math.floor(mx/cellSize);
 								let cy=Math.floor(my/cellSize);
 								let cell=grid[cx][cy];
 								cell.isRevealed=true;
 								console.log(evt,mx,my,cx,cy,grid[cx][cy]);
 						}
+
+						function countNeigbours(cell)
+						{
+								let count=0;
+								for(let i=cell.x-1;i<=cell.x+1;i++){
+										for(let j=cell.y-1;j<=cell.y+1;j++){
+												if(i<=0 && i < cols && j >= 0 && j < rows){
+														let neigbour=grid[i][j];												
+														if(neigbour.hasBomb){
+																count++;
+														}
+												}
+										}
+								}
+								return count;
+						}
 				</script>
 		</head>
 		<body onload="setup();">
 				<canvas id="sea"></canvas>
+				<button onclick="initGame();">Restart game</button>
 		</body>
 </html>
